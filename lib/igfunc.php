@@ -109,7 +109,7 @@ function proccess($ighost, $useragent, $url, $cookie = 0, $data = 0, $httpheader
     curl_setopt($ch, CURLOPT_HEADER, 1);
     if ($cookie)
         curl_setopt($ch, CURLOPT_COOKIE, $cookie);
-    if ($data):
+    if ($data) :
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     endif;
@@ -148,7 +148,7 @@ function proccess_v2($ighost, $useragent, $url, $cookie = 0, $data = 0, $httphea
     curl_setopt($ch, CURLOPT_HEADER, 1);
     if ($cookie)
         curl_setopt($ch, CURLOPT_COOKIE, $cookie);
-    if ($data):
+    if ($data) :
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     endif;
@@ -187,7 +187,7 @@ function request($ighost, $useragent, $url, $cookie = 0, $data = 0, $httpheader 
     curl_setopt($ch, CURLOPT_HEADER, 1);
     if ($cookie)
         curl_setopt($ch, CURLOPT_COOKIE, $cookie);
-    if ($data):
+    if ($data) :
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     endif;
@@ -206,30 +206,31 @@ function request($ighost, $useragent, $url, $cookie = 0, $data = 0, $httpheader 
     }
 }
 
-function cekpoint($url, $data, $csrf, $cookies, $ua){
-	$a = curl_init();
+function cekpoint($url, $data, $csrf, $cookies, $ua)
+{
+    $a = curl_init();
     curl_setopt($a, CURLOPT_URL, $url);
     curl_setopt($a, CURLOPT_USERAGENT, $ua);
-	curl_setopt($a, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($a, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($a, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($a, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($a, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($a, CURLOPT_HEADER, 1);
     curl_setopt($a, CURLOPT_COOKIE, $cookies);
-    if($data){
-    curl_setopt($a, CURLOPT_POST, 1);	
-    curl_setopt($a, CURLOPT_POSTFIELDS, $data);
+    if ($data) {
+        curl_setopt($a, CURLOPT_POST, 1);
+        curl_setopt($a, CURLOPT_POSTFIELDS, $data);
     }
-    if($csrf){
-    curl_setopt($a, CURLOPT_HTTPHEADER, array(
+    if ($csrf) {
+        curl_setopt($a, CURLOPT_HTTPHEADER, array(
             'Connection: keep-alive',
             'Proxy-Connection: keep-alive',
             'Accept-Language: en-US,en',
-            'x-csrftoken: '.$csrf,
+            'x-csrftoken: ' . $csrf,
             'x-instagram-ajax: 1',
-            'Referer: '.$url,
+            'Referer: ' . $url,
             'x-requested-with: XMLHttpRequest',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    ));
+        ));
     }
     $b = curl_exec($a);
     return $b;
@@ -307,7 +308,7 @@ function replace_friendship($teks, $tipe, $useragent, $cookies)
     $resp     = curl_exec($ch);
     $httpcode = curl_getinfo($ch);
     curl_close($ch);
-    if ($httpcode['http_code'] == 200):
+    if ($httpcode['http_code'] == 200) :
         preg_match('#","id":"(.*?)","biography":#', $resp, $idv);
         preg_match('#_limit_(.*?)::}#', $teks, $limit);
         $jumlah = (((int) $limit[1] - 1) > 10) ? 10 : ((int) $limit[1] - 1);
@@ -320,7 +321,7 @@ function replace_friendship($teks, $tipe, $useragent, $cookies)
                 'X-IG-Connection-Type: WIFI'
             ));
             $req        = json_decode($req[1]);
-            for ($i = 0; $i < count($req->users); $i++):
+            for ($i = 0; $i < count($req->users); $i++) :
                 if (count($list) <= $jumlah)
                     $list[count($list)] = $req->users[$i]->username;
             endfor;
@@ -331,7 +332,7 @@ function replace_friendship($teks, $tipe, $useragent, $cookies)
             $mention_people .= '@' . $list[$i] . ' ';
         preg_match('#{::(.*?)::}#', $teks, $teks1);
         return str_replace('{::' . $teks1[1] . '::}', $mention_people, $teks);
-    else:
+    else :
         return false;
     endif;
 }
@@ -347,13 +348,13 @@ function replace_media($teks, $tipe, $useragent, $cookies)
     $resp     = curl_exec($ch);
     $httpcode = curl_getinfo($ch);
     curl_close($ch);
-    if ($httpcode['http_code'] == 200):
+    if ($httpcode['http_code'] == 200) :
         $resp = json_decode($resp);
         preg_match('#_limit_(.*?)::}#', $teks, $limit);
         $jumlah = (((int) $limit[1] - 1) > 10) ? 10 : ((int) $limit[1] - 1);
         $list   = array();
         $c      = 0;
-        if ($tipe == 'likers'):
+        if ($tipe == 'likers') :
             do {
                 $req = proccess(1, $useragent, 'media/' . $resp->media_id . '/' . $tipe . '/', $cookies, null, array(
                     'Accept-Language: id-ID, en-US',
@@ -362,12 +363,12 @@ function replace_media($teks, $tipe, $useragent, $cookies)
                 $req = json_decode($req[1]);
                 if ($jumlah > count($req->users))
                     $jumlah = count($req->users) - 1;
-                for ($i = 0; $i < count($req->users); $i++):
+                for ($i = 0; $i < count($req->users); $i++) :
                     if (count($list) <= $jumlah)
                         $list[count($list)] = $req->users[$i]->username;
                 endfor;
             } while (count($list) <= $jumlah);
-        else:
+        else :
             do {
                 $parameters = ($c > 0) ? '?max_id=' . $c : '';
                 $reqs       = proccess(1, $useragent, 'media/' . $resp->media_id . '/' . $tipe . '/' . $parameters, $cookies, null, array(
@@ -377,7 +378,7 @@ function replace_media($teks, $tipe, $useragent, $cookies)
                 $req        = json_decode($reqs[1]);
                 if ($jumlah > $req->comment_count)
                     $jumlah = $req->comment_count - 1;
-                for ($i = 0; $i < count($req->comments); $i++):
+                for ($i = 0; $i < count($req->comments); $i++) :
                     if (count($list) <= $jumlah)
                         $list[count($list)] = $req->comments[$i]->user->username;
                 endfor;
@@ -393,7 +394,7 @@ function replace_media($teks, $tipe, $useragent, $cookies)
             $mention_people .= '@' . $list[$i] . ' ';
         preg_match('#{::(.*?)::}#', $teks, $teks1);
         return str_replace('{::' . $teks1[1] . '::}', $mention_people, $teks);
-    else:
+    else :
         return false;
     endif;
 }
@@ -411,16 +412,16 @@ function getuid($username)
     $arr      = explode(';</script>', $arr[1]);
     $obj      = json_decode($arr[0], true);
     $id       = $obj['entry_data']['ProfilePage'][0]['graphql']['user']['id'];
-    
+
     return $id;
 }
 
 function getmediaid($url)
 {
-    $getid   = file_get_contents("https://api.instagram.com/oembed/?url=".$url);
+    $getid   = file_get_contents("https://api.instagram.com/oembed/?url=" . $url);
     $json1   = json_decode($getid);
     $mediaid = $json1->media_id;
-    if($mediaid){
+    if ($mediaid) {
         return $mediaid;
     } else {
         return false;
